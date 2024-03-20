@@ -1,0 +1,152 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.26"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "Dependencies/csv-parser",
+					"childIndexes" : 
+					[
+						2,
+						3
+					],
+					"jsonFile" : "directory-Dependencies.csv-parser-Release-bb9f6c379be94f4728e9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.9"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "Dependencies/csv-parser"
+				},
+				{
+					"build" : "Dependencies/csv-parser/include/internal",
+					"jsonFile" : "directory-Dependencies.csv-parser.include.internal-Release-abff8e7b07664d675ad7.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.9"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "Dependencies/csv-parser/include/internal",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "Dependencies/csv-parser/programs",
+					"jsonFile" : "directory-Dependencies.csv-parser.programs-Release-83d56b5e3e0064cf245a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.9"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "Dependencies/csv-parser/programs",
+					"targetIndexes" : 
+					[
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Radar_Kalman_Filter",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"name" : "csv",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Radar_Kalman_Filter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Radar_Kalman_Filter-Release-d1bbff4996d2934c66ef.json",
+					"name" : "Radar_Kalman_Filter",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "csv::@4fb421aabfec9626857e",
+					"jsonFile" : "target-csv-Release-e3009f9449993a529e44.json",
+					"name" : "csv",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "csv_info::@df88b98c68033391bfdd",
+					"jsonFile" : "target-csv_info-Release-c702246346e836a2b50e.json",
+					"name" : "csv_info",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "csv_stats::@df88b98c68033391bfdd",
+					"jsonFile" : "target-csv_stats-Release-22094adf02995562dee6.json",
+					"name" : "csv_stats",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/riley/Projects/Radar_Kalman_Filter/cmake-build-release",
+		"source" : "/Users/riley/Projects/Radar_Kalman_Filter"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 5
+	}
+}
