@@ -6,8 +6,8 @@
 KalmanFilter::KalmanFilter() = default;
 
 
-KalmanFilter::KalmanFilter(Eigen::MatrixXd &F, Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, Eigen::MatrixXd &K, double &dt)
-: F(F), P(P), Q(Q), H(H), R(R), K(K), dt(dt), m(this->H.rows()), n(this->H.cols()), x_hat(n), x_hat_new(n), w(n), e(m), v(m), I(n, n) {
+KalmanFilter::KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, Eigen::MatrixXd &K, double &dt)
+: P(P), Q(Q), H(H), R(R), K(K), dt(dt), m(this->H.rows()), n(this->H.cols()), x_hat(n), e(m), v(m), I(n, n), F(n, n) {
     I.setIdentity();
 }
 
@@ -16,6 +16,13 @@ void KalmanFilter::init(Eigen::VectorXd &x0, double &t0) {
     this->x_hat = x0;
     this->t0 = t0;
     t = t0;
+    F << 1, 0, 0, 0, 0, 0, 0,
+         0, 1, 0, 0, 0, 0, 0,
+         0, 0, 1, 0, 0, 0, 0,
+         f4_vx(x_hat, dt), 0, f4_vz(x_hat, dt), 1, 0, 0, 0,
+         f5_vx(x_hat, dt), f5_vy(x_hat, dt), f5_vz(x_hat, dt), 0, 1, 0, 0,
+         0, 0, 0, 0, 0, 1, 0,
+         0, 0, 0, 0, 0, 0, 1;
 }
 
 void KalmanFilter::predict() {
@@ -23,7 +30,7 @@ void KalmanFilter::predict() {
         std::cerr << "KalmanFilter::predict() - Not initialized!" << std::endl;
         return;
     }
-    x_hat = F * x_hat + w;
+    x_hat = F * x_hat;
     P = F * P * F.transpose() + Q;
 
     t += dt;
@@ -43,6 +50,24 @@ void KalmanFilter::update(Eigen::VectorXd &z) {
 double KalmanFilter::f4_vx(Eigen::VectorXd &x, double &t) {
     return (t * x(2)) / (pow(x(0), 2) + pow(x(2), 2));
 }
+
+double KalmanFilter::f4_vz(Eigen::VectorXd &x, double &t) {
+    return (-t * x(0)) / (pow(x(0), 2) + pow(x(2), 2));
+}
+
+double KalmanFilter::f5_vx(Eigen::VectorXd &x, double &t) {
+    return (-t * x(1) * x(3)) / ((pow(x(0), 2) + pow(x(1),2) + pow(x(2), 2)) * sqrt(pow(x(0), 2) + pow(x(2), 2)));
+}
+
+double KalmanFilter::f5_vy(Eigen::VectorXd &x, double &t) {
+    return (t * sqrt(pow(x(1), 2) + pow(x(2), 2))) / (pow(x(0), 2) + pow(x(1),2) + pow(x(2), 2));
+}
+
+double KalmanFilter::f5_vz(Eigen::VectorXd &x, double &t) {
+    return (-t * x(1) * x(2)) / ((pow(x(0), 2) + pow(x(1),2) + pow(x(2), 2)) * sqrt(pow(x(0), 2) + pow(x(2), 2)));
+}
+
+
 
 
 
