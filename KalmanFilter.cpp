@@ -40,6 +40,12 @@ void KalmanFilter::update(Eigen::VectorXd &z) {
     P = (I - K * H) * P;
 }
 
+double KalmanFilter::f4_vx(Eigen::VectorXd &x, double &t) {
+    return (t * x(2)) / (pow(x(0), 2) + pow(x(2), 2));
+}
+
+
+
 
 
 

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "rapidcsv.h"
+#include <cmath>
 
 int main() {
     rapidcsv::Document doc("tracks.csv");
@@ -37,7 +38,14 @@ int main() {
         }
     }
 
-    Eigen::MatrixXd P = F.block(0, 0, inc, 6);
+    Eigen::MatrixXd Data = F.block(0, 0, inc, 6);
+
+    Eigen::MatrixXd H(5, 7);
+    H << 1, 0, 0, 0, 0, 0, 0,
+         0, 1, 0, 0, 0, 0, 0,
+         0, 0, 1, 0, 0, 0, 0,
+         0, 0, 0, 1, 0, 0, 0,
+         0, 0, 0, 0, 1, 0, 0;
 
     Eigen::MatrixXd A(7, 7);
     A << 1, 0, 0, 0, 0, 0, 0,

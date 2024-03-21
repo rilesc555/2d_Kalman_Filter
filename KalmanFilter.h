@@ -28,6 +28,8 @@ private:
     //x_hat is the state vector. x_hat_new is the updated state vector. e is the error vector. w is the process noise vector.
     Eigen::VectorXd x_hat, x_hat_new, e, w, v;
 
+    //x_hat = [vx, vy, vz, az, el, azroc, elroc]
+
 
 
     int m{}, n{};
@@ -35,7 +37,11 @@ private:
 
     bool initialized = false;
 
-
+    double f4_vx(Eigen::VectorXd &x, double &t);
+    double f4_vz(Eigen::VectorXd &x, double &t);
+    double f5_vx(Eigen::VectorXd &x, double &t);
+    double f5_vy(Eigen::VectorXd &x, double &t);
+    double f5_vz(Eigen::VectorXd &x, double &t);
 
 public:
     KalmanFilter();
