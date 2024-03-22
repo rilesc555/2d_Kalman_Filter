@@ -25,10 +25,10 @@ private:
     // Identity matrix.
     Eigen::MatrixXd I;
 
-    //x_hat is the state vector. x_hat_new is the updated state vector. e is the error vector. v is the measurement noise
-    Eigen::VectorXd x_hat, e, v;
+    //x_hat is the state vector. x_hat_new is the updated state vector. y is the error vector. v is the measurement noise
+    Eigen::VectorXd x_hat, y, v;
 
-    //x_hat = [vx, vy, vz, az, el, azroc, elroc]
+    //x_hat = [vx, vy, vz, az, el, azdot, eldot]
 
 
 
@@ -45,10 +45,12 @@ private:
 
 public:
     KalmanFilter();
-    KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, Eigen::MatrixXd &K, double &dt);
+    KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, double &dt);
     void init(Eigen::VectorXd& x0, double& t0);
     void predict();
     void update(Eigen::VectorXd& z);
+
+    Eigen::VectorXd get_x_hat() { return x_hat; }
 };
 
 

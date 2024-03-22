@@ -6,9 +6,10 @@
 KalmanFilter::KalmanFilter() = default;
 
 
-KalmanFilter::KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, Eigen::MatrixXd &K, double &dt)
-: P(P), Q(Q), H(H), R(R), K(K), dt(dt), m(this->H.rows()), n(this->H.cols()), x_hat(n), e(m), v(m), I(n, n), F(n, n) {
-    I.setIdentity();
+KalmanFilter::KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, double &dt)
+: P(P), Q(Q), H(H), R(R), K(7, 7), dt(dt), m(static_cast<int>(this->H.rows())), n(static_cast<int>(this->H.cols())), x_hat(n), y(m), v(m) {
+    this->I = Eigen::MatrixXd::Identity(n, n);
+    this->F = Eigen::MatrixXd::Zero(n, n);
 }
 
 void KalmanFilter::init(Eigen::VectorXd &x0, double &t0) {
@@ -27,7 +28,7 @@ void KalmanFilter::init(Eigen::VectorXd &x0, double &t0) {
 
 void KalmanFilter::predict() {
     if (!initialized) {
-        std::cerr << "KalmanFilter::predict() - Not initialized!" << std::endl;
+        std::cerr << "KalmanFilter - Not initialized!" << std::endl;
         return;
     }
     x_hat = F * x_hat;
@@ -41,9 +42,9 @@ void KalmanFilter::update(Eigen::VectorXd &z) {
         std::cerr << "KalmanFilter::update() - Not initialized!" << std::endl;
         return;
     }
-    e = z - (H * x_hat + v);
+    y = z - (H * x_hat);
     K = P * H.transpose() * (H * P * H.transpose() + R).inverse();
-    x_hat = x_hat + K * e;
+    x_hat = x_hat + K * y;
     P = (I - K * H) * P;
 }
 
@@ -66,6 +67,10 @@ double KalmanFilter::f5_vy(Eigen::VectorXd &x, double &t) {
 double KalmanFilter::f5_vz(Eigen::VectorXd &x, double &t) {
     return (-t * x(1) * x(2)) / ((pow(x(0), 2) + pow(x(1),2) + pow(x(2), 2)) * sqrt(pow(x(0), 2) + pow(x(2), 2)));
 }
+
+
+
+
 
 
 
