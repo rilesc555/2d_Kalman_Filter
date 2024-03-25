@@ -14,10 +14,41 @@
 #include <algorithm>
 
 int main() {
+    int trackID;
+
+
+
     auto now = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(now);
 
     rapidcsv::Document doc("tracks.csv");
+    std::vector<int> trackIDs = doc.GetColumn<int>("track_id");
+    std::vector<int> uniqueTrackIDs;
+    std::map<int, int> trackIDCount;
+    for (int trackID : trackIDs) {
+        if (trackIDCount.find(trackID) == trackIDCount.end()) {
+            trackIDCount[trackID] = 1;
+        }
+        else {
+            trackIDCount[trackID]++;
+        }
+    }
+    uniqueTrackIDs.reserve(trackIDCount.size());
+    for (auto const& [key, val] : trackIDCount) {
+        uniqueTrackIDs.push_back(key);
+    }
+    std::cout << "Unique track IDs: ";
+    for (auto& [id, count] : trackIDCount) {
+        std::cout << id << " - " << count << " tracks\n";
+    }
+
+    std::cout << "Enter a track ID: ";
+    std::cin >> trackID;
+    while (std::find(uniqueTrackIDs.begin(), uniqueTrackIDs.end(), trackID) == uniqueTrackIDs.end()) {
+        std::cout << "Invalid track ID. Please enter a valid track ID: ";
+        std::cin >> trackID;
+    }
+
     std::vector<double> id, vx, vy, vz, az, el;
 
     id = doc.GetColumn<double>("track_id");
@@ -27,14 +58,14 @@ int main() {
     az = doc.GetColumn<double>("az");
     el = doc.GetColumn<double>("el");
 
-    int id120 = std::count(id.begin(), id.end(), 120);
+    int id120 = std::count(id.begin(), id.end(), trackID);
 
 
     Eigen::MatrixXd Data(id120, 6);
     int inc = 0;
 
     for (int i = 0; i < id.size(); i++) {
-        if (id.at(i) == 120) {
+        if (id.at(i) == trackID) {
             Data(inc, 0) = id.at(i);
             Data(inc, 1) = vx.at(i);
             Data(inc, 2) = vy.at(i);
@@ -58,13 +89,13 @@ int main() {
          0, 0, 0, 0, 1, 0, 0;
 
     Eigen::MatrixXd Q(7, 7);
-    Q << 0.1, 0, 0, 0, 0, 0, 0,
-         0, 0.1, 0, 0, 0, 0, 0,
-         0, 0, 0.1, 0, 0, 0, 0,
-         0, 0, 0, 0.1, 0, 0, 0,
-         0, 0, 0, 0, 0.1, 0, 0,
-         0, 0, 0, 0, 0, 0.1, 0,
-         0, 0, 0, 0, 0, 0, 0.1;
+    Q << 1.2, 0, 0, 0, 0, 0, 0,
+         0, 1.2, 0, 0, 0, 0, 0,
+         0, 0, 1.2, 0, 0, 0, 0,
+         0, 0, 0, 1.2, 0, 0, 0,
+         0, 0, 0, 0, 1.2, 0, 0,
+         0, 0, 0, 0, 0, 1.2, 0,
+         0, 0, 0, 0, 0, 0, 1.2;
 
     Eigen::MatrixXd P(7,7);
     P << 1, 0, 0, 0, 0, 0, 0,
@@ -99,10 +130,12 @@ int main() {
     Eigen::VectorXd z(5);
     for (int i = 1; i < Data.rows(); i++) {
         z << Data(i, 1), Data(i, 2), Data(i, 3), Data(i, 4), Data(i, 5);
+        Eigen::VectorXd x_hat = kf.get_x_hat();
+        file << trackID << "," << x_hat(0) << "," << x_hat(1) << "," << x_hat(2) << "," << x_hat(3) << "," << x_hat(4) << "," << x_hat(5) << "," << x_hat(6) << "\n";
         kf.predict();
         kf.update(z);
-        Eigen::VectorXd x_hat = kf.get_x_hat();
-        file << "120" << "," << x_hat(0) << "," << x_hat(1) << "," << x_hat(2) << "," << x_hat(3) << "," << x_hat(4) << "," << x_hat(5) << "," << x_hat(6) << "\n";
+
+
     }
 
     file.close();
