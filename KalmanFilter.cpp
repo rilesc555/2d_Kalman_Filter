@@ -5,9 +5,13 @@
 
 KalmanFilter::KalmanFilter() = default;
 
-
 KalmanFilter::KalmanFilter(Eigen::MatrixXd &P, Eigen::MatrixXd &Q, Eigen::MatrixXd &H, Eigen::MatrixXd &R, double &dt)
-: P(P), Q(Q), H(H), R(R), K(7, 7), dt(dt), m(static_cast<int>(this->H.rows())), n(static_cast<int>(this->H.cols())), x_hat(n), y(m), v(m) {
+: P(P), Q(Q), H(H), R(R), K(7, 7), F(7,7), dt(dt) {
+    m = static_cast<int>(this->H.rows());
+    n = static_cast<int>(this->H.cols());
+    x_hat = Eigen::VectorXd::Zero(n);
+    y = Eigen::VectorXd::Zero(m);
+    v = Eigen::VectorXd::Zero(m);
     this->I = Eigen::MatrixXd::Identity(n, n);
     this->F = Eigen::MatrixXd::Zero(n, n);
 }
