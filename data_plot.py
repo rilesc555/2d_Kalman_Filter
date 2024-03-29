@@ -22,8 +22,15 @@ rel, kel = rdfID["el"], kdf["el"]
 
 time_range = pd.Series(range(0, len(kaz)))
 
-plt.plot(time_range, raz)
-plt.plot(time_range, kaz)
+fig, axs = plt.subplots(2)
+
+axs[0].plot(time_range, raz)
+axs[0].plot(time_range, kaz)
+axs[0].set_title("Azimuth")
+
+axs[1].plot(time_range, rel)
+axs[1].plot(time_range, kel)
+axs[1].set_title("Elevation")
 
 
 azmse = np.mean((np.array(raz)-np.array(kaz)) ** 2)
