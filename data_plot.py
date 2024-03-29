@@ -12,32 +12,47 @@ import numpy as np
 
 plt.close("all")
 plt.ion()
+
+
+    
+    
+    
 kdf = pd.read_csv("cmake-build-debug/output.csv")
 rdf = pd.read_csv("cmake-build-debug/tracks.csv")
-rdfID = rdf[rdf["track_id"] == kdf.at[0,"ID"]]
+
+for i in range(10):
+    filename = "cmake-build-debug/output" + str(i) + ".csv"
+    kdf = pd.read_csv(filename)
+    rdfID = rdf[rdf["track_id"] == kdf.at[0,"ID"]]
+    raz, kaz = rdfID["az"], kdf["az"]
+    rel, kel = rdfID["el"], kdf["el"]
+    time_range = pd.Series(range(0, len(kaz)))
+    
+    plt.figure(i)
+    plt.title(filename)
+    plt.subplot(1,2,1)
+    plt.plot(time_range, raz)
+    plt.plot(time_range, kaz)
+    plt.title("Azimuth")
+    
+    plt.subplot(1,2,2)
+    plt.plot(time_range, rel)    
+    plt.plot(time_range, kel)
+    plt.title("Elevation")
+    
+    azmse = np.mean((np.array(raz)-np.array(kaz)) ** 2)
+    elmse = np.mean((np.array(rel) - np.array(kel)) ** 2)
+    
+    print("With Q at 0." + str(i) + ":")
+    print("AZ MSE: ", azmse)
+    print("EL MSE: ", elmse, "\n")
+    
+    
+    
+plt.show()
 
 
-raz, kaz = rdfID["az"], kdf["az"]
-rel, kel = rdfID["el"], kdf["el"]
 
-time_range = pd.Series(range(0, len(kaz)))
-
-fig, axs = plt.subplots(2)
-
-axs[0].plot(time_range, raz)
-axs[0].plot(time_range, kaz)
-axs[0].set_title("Azimuth")
-
-axs[1].plot(time_range, rel)
-axs[1].plot(time_range, kel)
-axs[1].set_title("Elevation")
-
-
-azmse = np.mean((np.array(raz)-np.array(kaz)) ** 2)
-elmse = np.mean((np.array(rel) - np.array(kel)) ** 2)
-
-print("AZ MSE: ", azmse)
-print("EL MSE: ", elmse)
 
 
 
