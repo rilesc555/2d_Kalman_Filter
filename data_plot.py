@@ -17,11 +17,11 @@ plt.ion()
     
     
     
-kdf = pd.read_csv("cmake-build-debug/output.csv")
 rdf = pd.read_csv("cmake-build-debug/tracks.csv")
 
+
 for i in range(10):
-    filename = "cmake-build-debug/output" + str(i) + ".csv"
+    filename = "cmake-build-debug/191/output" + str(i) + ".csv"
     kdf = pd.read_csv(filename)
     rdfID = rdf[rdf["track_id"] == kdf.at[0,"ID"]]
     raz, kaz = rdfID["az"], kdf["az"]
@@ -46,8 +46,6 @@ for i in range(10):
     print("With Q at 0." + str(i) + ":")
     print("AZ MSE: ", azmse)
     print("EL MSE: ", elmse, "\n")
-    
-    
     
 plt.show()
 

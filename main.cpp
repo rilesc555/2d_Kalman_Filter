@@ -20,10 +20,11 @@ std::vector<int> sortIDs(const std::vector<double>& id);
 int main() {
     int trackID;
 
+    //read in data from csv
     rapidcsv::Document doc("tracks.csv");
 
+    //get desired columns from csv
     std::vector<double> id, vx, vy, vz, az, el;
-
     id = doc.GetColumn<double>("track_id");
     vx = doc.GetColumn<double>("vel_x");
     vy = doc.GetColumn<double>("vel_y");
@@ -31,10 +32,13 @@ int main() {
     az = doc.GetColumn<double>("az");
     el = doc.GetColumn<double>("el");
 
+    //sort track ids by frequency
     std::vector<int> trackIDs = sortIDs(id);
-    for (int uniqueid : trackIDs)
-    {
 
+    //loop through top 10 track ids
+    for (int k = 0; k < 10; k++)
+    {
+        int uniqueid = trackIDs.at(k);
         int count = std::count(id.begin(), id.end(), uniqueid);
 
         //build data matrix for each track id
@@ -78,13 +82,11 @@ int main() {
                 0, 0, velVar, 0, 0,
                 0, 0, 0, azVar, 0,
                 0, 0, 0, 0, elVar;
-
         Eigen::VectorXd x0(7);
         x0 << Data(0, 1), Data(0, 2), Data(0, 3), Data(0, 4), Data(0, 5), 0, 0;
 
         double t0 = 0;
         double dt = .104;
-
         double Qvar = 0;
 
         //loop through different Q values and output to csv
@@ -98,17 +100,23 @@ int main() {
                     0, 0, 0, 0, 0, Qvar, 0,
                     0, 0, 0, 0, 0, 0, Qvar;
 
+            //create directory for each track id
             std::filesystem::path dir = std::to_string(uniqueid);
             if (!std::filesystem::exists(dir)) {
                 std::filesystem::create_directory(dir);
             }
+
+            //create output file and header
             std::string filename = "output" + std::to_string(j) + ".csv";
             std::ofstream file(dir / filename);
             file << "ID,vel_x,vel_y,vel_z,az,el,azdot,eldot\n";
 
+            //initialize Kalman filter
             KalmanFilter kf(P, Q, H, R, dt);
             kf.init(x0, t0);
             Eigen::VectorXd z(5);
+
+            //loop through data, apply filter and write to file
             for (int i = 0; i < Data.rows(); i++) {
                 z << Data(i, 1), Data(i, 2), Data(i, 3), Data(i, 4), Data(i, 5);
                 Eigen::VectorXd x_hat = kf.get_x_hat();
@@ -120,8 +128,8 @@ int main() {
             file.close();
             Qvar += .1;
         }
+        std::cout << "Done with track ID " << uniqueid << std::endl;
     }
-
 }
 
 std::vector<int> sortIDs(const std::vector<double>& id) {
