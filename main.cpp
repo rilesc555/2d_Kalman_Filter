@@ -16,9 +16,6 @@
 int main() {
     int trackID;
 
-    auto now = std::chrono::system_clock::now();
-    std::time_t start_time = std::chrono::system_clock::to_time_t(now);
-
     rapidcsv::Document doc("tracks.csv");
 
     std::cout << "Enter a track ID: ";
@@ -33,10 +30,10 @@ int main() {
     az = doc.GetColumn<double>("az");
     el = doc.GetColumn<double>("el");
 
-    int id120 = std::count(id.begin(), id.end(), trackID);
+    int count = std::count(id.begin(), id.end(), trackID);
 
 
-    Eigen::MatrixXd Data(id120, 6);
+    Eigen::MatrixXd Data(count, 6);
     int inc = 0;
 
     for (int i = 0; i < id.size(); i++) {
@@ -61,14 +58,7 @@ int main() {
          0, 0, 0, 1, 0, 0, 0,
          0, 0, 0, 0, 1, 0, 0;
 
-    Eigen::MatrixXd Q(7, 7);
-    Q << .1, 0, 0, 0, 0, 0, 0,
-         0, .1, 0, 0, 0, 0, 0,
-         0, 0, .1, 0, 0, 0, 0,
-         0, 0, 0, .1, 0, 0, 0,
-         0, 0, 0, 0, .1, 0, 0,
-         0, 0, 0, 0, 0, .1, 0,
-         0, 0, 0, 0, 0, 0, .1;
+
 
     Eigen::MatrixXd P(7,7);
     P << 1, 0, 0, 0, 0, 0, 0,
@@ -95,27 +85,37 @@ int main() {
     double t0 = 0;
     double dt = .104;
 
-    std::ofstream file("output.csv");
-    file << "ID,vel_x,vel_y,vel_z,az,el,azdot,eldot\n";
+    double Qvar = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        Eigen::MatrixXd Q(7, 7);
+        Q << Qvar, 0, 0, 0, 0, 0, 0,
+                0, Qvar, 0, 0, 0, 0, 0,
+                0, 0, Qvar, 0, 0, 0, 0,
+                0, 0, 0, Qvar, 0, 0, 0,
+                0, 0, 0, 0, Qvar, 0, 0,
+                0, 0, 0, 0, 0, Qvar, 0,
+                0, 0, 0, 0, 0, 0, Qvar;
 
-    KalmanFilter kf(P, Q, H, R, dt);
-    kf.init(x0, t0);
-    Eigen::VectorXd z(5);
-    for (int i = 0; i < Data.rows(); i++) {
-        z << Data(i, 1), Data(i, 2), Data(i, 3), Data(i, 4), Data(i, 5);
-        Eigen::VectorXd x_hat = kf.get_x_hat();
-        file << trackID << "," << x_hat(0) << "," << x_hat(1) << "," << x_hat(2) << "," << x_hat(3) << "," << x_hat(4) << "," << x_hat(5) << "," << x_hat(6) << "\n";
-        kf.predict();
-        kf.update(z);
+        std::string filename = "output" + std::to_string(i) + ".csv";
+        std::ofstream file(filename);
+        file << "ID,vel_x,vel_y,vel_z,az,el,azdot,eldot\n";
+
+        KalmanFilter kf(P, Q, H, R, dt);
+        kf.init(x0, t0);
+        Eigen::VectorXd z(5);
+        for (int i = 0; i < Data.rows(); i++) {
+            z << Data(i, 1), Data(i, 2), Data(i, 3), Data(i, 4), Data(i, 5);
+            Eigen::VectorXd x_hat = kf.get_x_hat();
+            file << trackID << "," << x_hat(0) << "," << x_hat(1) << "," << x_hat(2) << "," << x_hat(3) << ","
+                 << x_hat(4) << "," << x_hat(5) << "," << x_hat(6) << "\n";
+            kf.predict();
+            kf.update(z);
+        }
+
+        file.close();
+        Qvar += .1;
     }
-
-    file.close();
-
-    now = std::chrono::system_clock::now();
-    std::time_t end_time = std::chrono::system_clock::to_time_t(now);
-    time_t elapsed_time = end_time - start_time;
-
-    std::cout << "Time elapsed: " << elapsed_time << " seconds\n";
 
 
 
